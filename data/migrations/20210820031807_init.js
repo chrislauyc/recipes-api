@@ -30,8 +30,9 @@ exports.up = function(knex) {
         .notNullable()
         .references("step_id")
         .inTable("steps");
-        table.string("quantity")
-        .notNullable();
+        table.double("quantity")
+        .notNullable()
+        .unsigned();
     });
 };
 
