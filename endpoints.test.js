@@ -3,27 +3,6 @@ const server = require('./api/server')
 const db = require('./data/db-config')
 const { recipes } = require('./data/seeds/001-recipes')
 
-const data = {
-  "recipe_id" : 2,
-  "name": "Spaghetti Bolognese",
-  "created_at": "2021-01-01 08:23:19.120",
-  "steps": [
-    {
-      "step_id": 5,
-      "step_number": 1,
-      "instructions": "Put a large saucepan on a medium heat",
-      "ingredients": []
-    },
-    {
-      "step_id": 6,
-      "step_number": 2,
-      "instructions": "Add 1 tbsp olive oil",
-      "ingredients": [
-        { "ingredient_id": 4, "name": "olive oil", "quantity": 0.014 }
-      ]
-    },
-  ]
-}
 /**
 [GET] /api/recipes
 [GET] /api/recipes/:id
@@ -299,7 +278,7 @@ describe('server.js', () => {
       let res = await request(server).put('/api/recipes/111').send({ name: 'foo', budget: 1000 })
       expect(res.status).toBe(404)
     }, 750)
-    test('[18] responds with a 400 and proper error if name or budget are undefined', async () => {
+    test('[18] responds with a 400 and proper error if name or steps are undefined', async () => {
       const invalid1 = {}
       const invalid2 = { name: "foo" }
       const invalid3 = { steps: [{
@@ -393,5 +372,40 @@ describe('server.js', () => {
       let res = await request(server).delete('/api/recipes/111')
       expect(res.body.message).toMatch(/recipe not found/i)
     }, 750)
-  })
+  });
+  describe("[GET] /api/recipes/:id",()=>{
+    test("[26] can obtain the ingredients", async ()=>{
+      const recipe = { 
+        name: 'foo', steps: [
+          {
+            step_number:1,
+            ingredients:[
+              {
+                "name": "vegetable oil",
+                "quantity": 0.014
+              }
+            ],
+            instructions:"put them together and then cook them"
+          },
+          {
+            step_number:2,
+            ingredients:[
+              {
+                "name": "eggs",
+                "quantity": 0.014
+              },
+              {
+                "name": "tomatoes",
+                "quantity": 0.014
+              }
+            ],
+            instructions:"dice the tomatoes and fry the eggs. plate it up."
+          }
+      ]};
+      await request(server).post("/api/recipes/",recipe);
+      const res = await request(server).get(`/api/recipes/${recipes.length}/ingredients`);
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject(recipe);
+    },750);
+  });
 })
