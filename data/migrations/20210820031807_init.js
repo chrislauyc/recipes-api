@@ -2,7 +2,7 @@
 exports.up = function(knex) {
     return knex.schema.createTable("recipes",table=>{
         table.increments("recipe_id");
-        table.string("name").notNullable();
+        table.string("name").notNullable().unique();
     })
     .createTable("steps",table=>{
         table.increments("step_id");
@@ -18,7 +18,7 @@ exports.up = function(knex) {
     })
     .createTable("ingredients",table=>{
         table.increments("ingredient_id");
-        table.string("name").notNullable();
+        table.string("name").notNullable().unique();
     })
     .createTable("ingredients_steps",table=>{
         table.increments("id");
