@@ -1,7 +1,7 @@
 const request = require('supertest')
 const server = require('./api/server')
 const db = require('./data/db-config')
-const { recipes } = require('./data/seeds/01-recipes')
+const { recipes } = require('./data/seeds/001-recipes')
 
 const data = {
   "recipe_id" : 2,

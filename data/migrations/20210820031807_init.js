@@ -3,6 +3,7 @@ exports.up = function(knex) {
     return knex.schema.createTable("recipes",table=>{
         table.increments("recipe_id");
         table.string("name").notNullable().unique();
+        table.timestamp('created_at').defaultTo(knex.fn.now());
     })
     .createTable("steps",table=>{
         table.increments("step_id");

@@ -120,3 +120,4 @@ dist
 
 # misc
 .DS_Store
+*.db3
