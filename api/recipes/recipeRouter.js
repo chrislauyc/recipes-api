@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const recipeModel = require("./recipeModel");
 
 /*
     [GET] /api/recipes
@@ -8,25 +9,17 @@ const router = require("express").Router();
     [DELETE] /api/recipes/:id
     [GET] /api/recipes/:id/ingredients
 */
-router.get("/",(req,res,next)=>{
+router.get("/",async(req,res,next)=>{
     try{
-
+        res.status(200).json(await recipeModel.get(req.query));
     }
     catch(err){
         next(err);
     }
 });
-router.get("/:id",(req,res,next)=>{
+router.post("/",async(req,res,next)=>{
     try{
-
-    }
-    catch(err){
-        next(err);
-    }
-});
-router.post("/",(req,res,next)=>{
-    try{
-        
+        res.status(201).json(await recipeModel.insert(req.body));
     }
     catch(err){
         next(err);
@@ -34,7 +27,7 @@ router.post("/",(req,res,next)=>{
 });
 router.put("/:id",(req,res,next)=>{
     try{
-
+        res.status(200).json({message:"not implemented yet"})
     }
     catch(err){
         next(err);
@@ -42,7 +35,7 @@ router.put("/:id",(req,res,next)=>{
 });
 router.delete("/:id",(req,res,next)=>{
     try{
-
+        res.status(200).json(await recipeModel.remove(req.recipe_id));
     }
     catch(err){
         next(err);
@@ -50,7 +43,7 @@ router.delete("/:id",(req,res,next)=>{
 });
 router.get("/:id/ingredients",(req,res,next)=>{
     try{
-
+        res.status(200).json(await recipeModel.getIngredients(req.recipe_id));
     }
     catch(err){
         next(err);
