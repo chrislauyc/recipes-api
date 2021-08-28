@@ -1,5 +1,10 @@
 const router = require("express").Router();
 const recipeModel = require("./recipeModel");
+const {
+    checkValidRecipe,
+    recipe_nameCannotExist,
+    recipe_idMustExist
+} = require("./recipeMiddleware");
 
 /*
     [GET] /api/recipes
@@ -25,7 +30,15 @@ router.post("/",async(req,res,next)=>{
         next(err);
     }
 });
-router.put("/:id",(req,res,next)=>{
+router.get("/:recipe_id",recipe_idMustExist,async(req,res,next)=>{
+    try{
+        res.status(200).json(await recipeModel.getWholeRecipe(req.params.recipe_id));
+    }
+    catch(err){
+        next(err);
+    }
+});
+router.put("/:recipe_id",(req,res,next)=>{
     try{
         res.status(200).json({message:"not implemented yet"})
     }
@@ -33,7 +46,7 @@ router.put("/:id",(req,res,next)=>{
         next(err);
     }
 });
-router.delete("/:id",(req,res,next)=>{
+router.delete("/:recipe_id",async(req,res,next)=>{
     try{
         res.status(200).json(await recipeModel.remove(req.recipe_id));
     }
@@ -41,7 +54,7 @@ router.delete("/:id",(req,res,next)=>{
         next(err);
     }
 });
-router.get("/:id/ingredients",(req,res,next)=>{
+router.get("/:recipe_id/ingredients",async(req,res,next)=>{
     try{
         res.status(200).json(await recipeModel.getIngredients(req.recipe_id));
     }

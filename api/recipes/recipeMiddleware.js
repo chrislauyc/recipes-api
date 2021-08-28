@@ -36,7 +36,7 @@ const checkValidRecipe=(req,res,next)=>{
         next(err);
     }
 };
-const recipe_nameCannotExist=(req,res,next)=>{
+const recipe_nameCannotExist=async(req,res,next)=>{
     try{
         const recipes = await recipeModel.get({recipe_name:req.body.recipe_name});
         if(recipes.length !== 0){
@@ -48,11 +48,11 @@ const recipe_nameCannotExist=(req,res,next)=>{
         next(err);
     }
 };
-const recipe_idMustExist=(req,res,next)=>{
+const recipe_idMustExist=async(req,res,next)=>{
     try{
-        const recipes = await recipeModel.get({recipe_id:req.body.recipe_id});
+        const recipes = await recipeModel.get({recipe_id:req.params.recipe_id});
         if(recipes.length !== 1){
-            return res.status(404).json({message:"recipe_id does not exist"});
+            return res.status(404).json({message:"recipe not found"});
         }
         next();
     }

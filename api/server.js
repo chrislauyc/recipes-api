@@ -1,6 +1,6 @@
 const express = require("express");
 const server = express();
-const router = require("path to router");
+const router = require("./recipes/recipeRouter");
 server.use(express.json());
 
 

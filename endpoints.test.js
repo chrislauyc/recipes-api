@@ -38,12 +38,55 @@ describe('server.js', () => {
       expect(res.body).toHaveLength(0)
     }, 750)
   })
-  describe('[GET] /api/recipes/:id', () => {
+  describe('[GET] /api/recipes/:recipe_id', () => {
     test('[3] can get the correct recipe', async () => {
-      let res = await request(server).get('/api/recipes/1')
-      expect(res.body).toMatchObject(recipes[0])
-      res = await request(server).get('/api/recipes/2')
-      expect(res.body).toMatchObject(recipes[1])
+      const recipeExpected = { 
+        recipe_id: 1,
+        recipe_name: 'mac n cheese', 
+        created_at:"2021-01-01 08:23:19.120",
+        steps: [
+          {
+            step_number:1,
+            ingredients:[
+              {
+                ingredient_name: "macaroni",
+                quantity: 1
+              },
+              {
+                ingredient_name: "cheese",
+                quantity: 0.2
+              },
+              {
+                ingredient_name: "water",
+                quantity: 0.3
+              }
+            ],
+            instructions:"put everything together"
+          },
+          {
+            step_number:2,
+            ingredients:[
+              {
+                ingredient_name:"butter",
+                quantity:0.014
+              }
+            ],
+            instructions:"cook it a little"
+          },
+          {
+            step_number:3,
+            ingredients:[],
+            instructions:"simmer a little"
+          },
+          {
+            step_number:4,
+            ingredients:[],
+            instructions:"plate up"
+          }
+        ]
+      }
+      let res = await request(server).get('/api/recipes/1');
+      expect(res.body).toMatchObject(recipeExpected);
     }, 750)
     test('[4] responds with a 404 if the id does not exist', async () => {
       let res = await request(server).get('/api/recipes/111')
@@ -68,7 +111,6 @@ describe('server.js', () => {
             ],
             instructions:"put them together and then cook them"
           }
-
       ]})
       let recipe = await db('recipe');
       expect(recipe).toHaveLength(recipe.length + 1);

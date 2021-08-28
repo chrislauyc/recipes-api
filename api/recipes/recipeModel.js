@@ -14,26 +14,39 @@ const get=async({recipe_id,recipe_name,limit=10,page=0})=>{
         .offset(page);
 };
 const getWholeRecipe=async(recipe_id)=>{
-    const recipe = await db.select("recipe_name","step_number","instructions").from("recipes")
-    .leftJoin("steps","recipes.recipe_id","steps.recipe_id")
-    .where({recipe_id}).first();
+    const recipe = await db("recipes").where({recipe_id}).first();
+    const steps = await db("steps").where({recipe_id});
     return {
-        name:recipe[0].name,
-        steps:recipe.map(row=>({
-            step_number:row.step_number,
-            instructions:row.instructions,
-            ingredients: await db.select("ingredients_name","quantity").from("ingredients")
+        ...recipe,
+        steps: await Promise.all(steps.map(async(step)=>{
+            const ingredients = await db.select("ingredient_name","quantity")
+                .from("ingredients")
                 .join("ingredients_steps","ingredients_steps.ingredient_id","ingredients.ingredient_id")
                 .join("steps","ingredients_steps.step_id","steps.step_id")
+                .where("steps.step_id",step.step_id)
+            return {
+                step_number:step.step_number,
+                instructions:step.instructions,
+                ingredients
+            }
         }))
+        // steps: steps.map(async(row)=>{
+        //         return {
+        //             step_number:row.step_number,
+        //             instructions:row.instructions,
+        //             ingredients: await db.select("ingredient_name","quantity").from("ingredients")
+        //                 .join("ingredients_steps","ingredients_steps.ingredient_id","ingredients.ingredient_id")
+        //                 .join("steps","ingredients_steps.step_id","steps.step_id")
+        //         };
+        //     })
     }
 };
 const insert=async(recipe)=>{
     const [recipe_id] = await db("recipes").insert(recipe.recipe_name);
-    recipe.steps.forEach(step=>{
+    recipe.steps.forEach(async(step)=>{
         const {step_number,instructions,ingredients} = step;
         const [step_id] = await db("steps").insert({step_number,recipe_id,instructions});
-        ingredients.forEach(ingredient=>{
+        ingredients.forEach(async(ingredient)=>{
             const {ingredient_name,quantity} = ingredient;
             let ingredient_id = await db("ingredients").where({ingredient_name}).first();
             if(!ingredient_id){
