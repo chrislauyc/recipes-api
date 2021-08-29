@@ -1,14 +1,14 @@
-const { restart } = require("nodemon");
 const recipeModel = require("./recipeModel");
 const checkValidRecipe=(req,res,next)=>{
     try{
         const {recipe_name,steps} = req.body;
         if(recipe_name === undefined || typeof(recipe_name) !== "string"){
-            return res.status(400).json({message:"invalid recipe_name"});
+            return res.status(400).json({message:`invalid recipe_name: ${recipe_name}`});
         }
-        if(steps === undefined || typeof(steps) !== "array"){
+        if(steps === undefined || !Array.isArray(steps)){
             return res.status(400).json({message:"invalid steps"});
         }
+        req.body.recipe_name = recipe_name.trim();
         steps.forEach(step=>{
             const {step_number,instructions,ingredients} = step;
             if(step_number === undefined || typeof(step_number) !== "number"){
@@ -17,9 +17,10 @@ const checkValidRecipe=(req,res,next)=>{
             if(instructions === undefined || typeof(instructions) !== "string"){
                 return res.status(400).json({message:"invalid instructions"});
             }
-            if(ingredients === undefined || typeof(ingredients) !== "array"){
+            if(ingredients === undefined || !Array.isArray(ingredients)){
                 return res.status(400).json({message:"invalid ingredients"});
             }
+            req.body.instructions = instructions.trim();
             ingredients.forEach(ing=>{
                 const {ingredient_name,quantity} = ing;
                 if(ingredient_name === undefined || typeof(ingredient_name) !== "string"){
@@ -28,6 +29,7 @@ const checkValidRecipe=(req,res,next)=>{
                 if(quantity === undefined || typeof(quantity) !== "number"){
                     return res.status(400).json({message:"invalid quantity"});
                 }
+                req.ingredient_name = ingredient_name.trim();
             });
         });
         next();

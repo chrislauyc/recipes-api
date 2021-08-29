@@ -30,31 +30,27 @@ const getWholeRecipe=async(recipe_id)=>{
                 ingredients
             }
         }))
-        // steps: steps.map(async(row)=>{
-        //         return {
-        //             step_number:row.step_number,
-        //             instructions:row.instructions,
-        //             ingredients: await db.select("ingredient_name","quantity").from("ingredients")
-        //                 .join("ingredients_steps","ingredients_steps.ingredient_id","ingredients.ingredient_id")
-        //                 .join("steps","ingredients_steps.step_id","steps.step_id")
-        //         };
-        //     })
     }
 };
 const insert=async(recipe)=>{
-    const [recipe_id] = await db("recipes").insert(recipe.recipe_name);
-    recipe.steps.forEach(async(step)=>{
+    const [recipe_id] = await db("recipes").insert({recipe_name:recipe.recipe_name});
+    recipe.steps
+    for(const step of recipe.steps){
         const {step_number,instructions,ingredients} = step;
         const [step_id] = await db("steps").insert({step_number,recipe_id,instructions});
-        ingredients.forEach(async(ingredient)=>{
+        for(const ingredient of ingredients){
             const {ingredient_name,quantity} = ingredient;
-            let ingredient_id = await db("ingredients").where({ingredient_name}).first();
-            if(!ingredient_id){
-                ingredient_id = await db("ingredients").insert({step_id,ingredient_name,quantity})[0];
+            const ingredientFound = await db("ingredients").where({ingredient_name}).first();
+            let ingredient_id;
+            if(!ingredientFound){
+                ingredient_id = Number((await db("ingredients").insert({ingredient_name}))[0]);
+            }
+            else{
+                ingredient_id = ingredientFound.ingredient_id;
             }
             await db("ingredients_steps").insert({step_id,ingredient_id,quantity});
-        });
-    });
+        }
+    }
     return getWholeRecipe(recipe_id);
 };
 
@@ -74,8 +70,8 @@ const getIngredients=(recipe_id)=>{
     .join("steps","steps.recipe_id","recipes.recipe_id")
     .join("ingredients_steps","ingredients_steps.step_id","steps.step_id")
     .join("ingredients", "ingredients.ingredient_id","ingredients_steps.ingredient_id")
-    .where("",recipe_id)
-    .select("ingredients.ingredient_id as ingredient_id","ingredients.name as name");
+    .where("recipes.recipe_id",recipe_id)
+    .select("ingredients.ingredient_id as ingredient_id","ingredients.ingredient_name as name");
 };
 
 module.exports = {

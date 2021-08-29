@@ -22,7 +22,7 @@ router.get("/",async(req,res,next)=>{
         next(err);
     }
 });
-router.post("/",async(req,res,next)=>{
+router.post("/",checkValidRecipe,recipe_nameCannotExist,async(req,res,next)=>{
     try{
         res.status(201).json(await recipeModel.insert(req.body));
     }
@@ -46,9 +46,9 @@ router.put("/:recipe_id",(req,res,next)=>{
         next(err);
     }
 });
-router.delete("/:recipe_id",async(req,res,next)=>{
+router.delete("/:recipe_id",recipe_idMustExist,async(req,res,next)=>{
     try{
-        res.status(200).json(await recipeModel.remove(req.recipe_id));
+        res.status(200).json(await recipeModel.remove(req.params.recipe_id));
     }
     catch(err){
         next(err);
@@ -56,7 +56,7 @@ router.delete("/:recipe_id",async(req,res,next)=>{
 });
 router.get("/:recipe_id/ingredients",async(req,res,next)=>{
     try{
-        res.status(200).json(await recipeModel.getIngredients(req.recipe_id));
+        res.status(200).json(await recipeModel.getIngredients(req.params.recipe_id));
     }
     catch(err){
         next(err);
